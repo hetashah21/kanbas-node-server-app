@@ -5,17 +5,17 @@ export default function UserRoutes(app) {
   const createUser = async (req, res) => {
     const user = await dao.createUser(req.body);
     res.json(user);
-   };
+  };
   
   const deleteUser = async (req, res) => {
     const status = await dao.deleteUser(req.params.userId);
     res.json(status);
-   };
+  };
 
-  const findUserById = async(req, res) => {
+  const findUserById = async (req, res) => {
     const user = await dao.findUserById(req.params.userId);
     res.json(user);
-   };
+  };
   
   const findAllUsers = async (req, res) => {
     const { role, name } = req.query;
@@ -43,6 +43,7 @@ export default function UserRoutes(app) {
     } 
     res.json(currentUser);
   };
+
   const signup = async (req, res) => { 
     const user = await dao.findUserByUsername(req.body.username);
     if (user) {
@@ -54,6 +55,7 @@ export default function UserRoutes(app) {
     req.session["currentUser"] = currentUser;
     res.json(currentUser);
   };
+  
   const signin = async (req, res) => {
     const { username, password } = req.body;
     const currentUser = await dao.findUserByCredentials(username, password);
@@ -77,20 +79,6 @@ export default function UserRoutes(app) {
   const signout = async (req, res) => {
     req.session.destroy();
     res.sendStatus(200);
-  };
-
-  const findCoursesForEnrolledUser = async (req, res) => {
-    let { userId } = req.params;
-    if (userId === "current") {
-      const currentUser = req.session["currentUser"];
-      if (!currentUser) {
-        res.sendStatus(401);
-        return;
-      }
-      userId = currentUser._id;
-    }
-    const courses = courseDao.findCoursesForEnrolledUser(userId);
-    res.json(courses);
   };
 
   const createCourse = async (req, res) => {
@@ -128,6 +116,7 @@ export default function UserRoutes(app) {
     const status = await enrollmentsDao.enrollUserInCourse(uid, cid);
     res.send(status);
   };
+
   const unenrollUserFromCourse = async (req, res) => {
     let { uid, cid } = req.params;
     if (uid === "current") {
@@ -143,7 +132,6 @@ export default function UserRoutes(app) {
   app.delete("/api/users/:uid/courses/:cid", unenrollUserFromCourse);
   app.get("/api/users/:uid/courses", findCoursesForUser);
   app.post("/api/users/current/courses", createCourse);
-  app.get("/api/users/:userId/courses", findCoursesForEnrolledUser);
   app.post("/api/users", createUser);
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);
